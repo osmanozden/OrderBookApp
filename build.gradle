@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.23'
+}
+
+group = 'com.bitvavo.verifier'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = 17
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        jvmTarget = "17"
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'io.github.java-diff-utils:java-diff-utils:4.12'
+    testImplementation platform("org.junit:junit-bom:5.9.2")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': 'com.bitvavo.verifier.Application'
+    }
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+}
+
+test {
+    useJUnitPlatform()
+    reports {
+        junitXml.required = true
+        html.required = true
+    }
+}
